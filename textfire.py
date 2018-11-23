@@ -17,10 +17,9 @@ def main(stdscr):
         curses.init_pair(5,curses.COLOR_YELLOW,0)
         curses.init_pair(6,curses.COLOR_WHITE,0)
         for test in range(0,4):
-            stdscr.addstr(test+1,0,'pair {}: '.format(test),curses.color_pair(test))
+            stdscr.addstr(test+1,0,'pair {}: ######'.format(test),curses.color_pair(test))
         if curses.can_change_color()==True:
             stdscr.addstr(1,0,'Can change colors!')
-            curses.start_color()
             curses.init_color(0,0,0,0)
             curses.init_color(1,40,40,0)
             curses.init_color(2,100,100,0)
