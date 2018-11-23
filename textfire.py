@@ -17,7 +17,7 @@ def main(stdscr):
         curses.init_pair(5,curses.COLOR_YELLOW,0)
         curses.init_pair(6,curses.COLOR_WHITE,0)
         for test in range(0,4):
-            stdscr.addstr(test+1,0,'pair {}: ######'.format(test),curses.color_pair(test))
+            stdscr.addstr(test+1,0,'pair {}'.format(test),curses.color_pair(test))
         if curses.can_change_color()==True:
             stdscr.addstr(1,0,'Can change colors!')
             curses.init_color(0,0,0,0)
@@ -31,8 +31,7 @@ def main(stdscr):
             for pair in range(1,8):
                 curses.init_pair(pair,7-pair,0)
             for test in range(0,8):
-                stdscr.addstr(2+test,0,'pair {}: '.format(test),curses.color_pair(test))
-                stdscr.addstr(2+test,6,'######',curses.color_pair(test))
+                stdscr.addstr(2+test,0,'pair {}'.format(test),curses.color_pair(test))
             stdscr.refresh()
             stdscr.getkey()
             stdscr.clear()
@@ -43,14 +42,14 @@ def main(stdscr):
         for row in range(0,height-1):
             tmp = [None]*width
             for col in range(0,width):
-                avg = a[row+1][col]
+                avg = a[row+1][col]*10
                 if col > 0:
                     avg += a[row+1][col-1]
                     avg += a[row][col-1]
                 if col < width-1:
                     avg += a[row+1][col+1]
                     avg += a[row][col+1]
-                tmp[col]=avg/5.05
+                tmp[col]=avg/14.3
             a[row]=tmp
         for i in range(0,width):
             a[height-1][i]=random.random()
