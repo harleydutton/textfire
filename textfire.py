@@ -2,33 +2,32 @@ import curses
 import random
 import time
 import numpy as np
-
-#do everything as row,column and [row][column]
-#the numpy array seems to be indexed backwards
-
 width = 120
 height = 30
-speed = 5
-# .:-=+*#%@
+speed = 60
 gradient = [' ','.',':','-','=','+','*','#','%','@']
-#for colors it looks like we have black, red, yellow, and white.
-#i can try and define some more colors in curses
-#i want a series of nice oranges between white and black as my 8 colors.
-
-
 def main(stdscr):
     if curses.has_colors()==True:
         stdscr.addstr(0,0,'Has colors!')
+        curses.start_color()
+        curses.init_pair(1,curses.COLOR_BLACK,0)
+        curses.init_pair(2,curses.COLOR_BLACK,0)
+        curses.init_pair(3,curses.COLOR_RED,0)
+        curses.init_pair(4,curses.COLOR_YELLOW,0)
+        curses.init_pair(5,curses.COLOR_YELLOW,0)
+        curses.init_pair(6,curses.COLOR_WHITE,0)
+        for test in range(0,4):
+            stdscr.addstr(test+1,0,'pair {}: '.format(test),curses.color_pair(test))
         if curses.can_change_color()==True:
             stdscr.addstr(1,0,'Can change colors!')
             curses.start_color()
-            for color in range(1,7):
-                curses.init_color(color, 
-                        int(1000/6*color), 
-                        int(500/6*color), 
-                        int(200/6*color))
-                #fix this color palatte at some point
             curses.init_color(0,0,0,0)
+            curses.init_color(1,40,40,0)
+            curses.init_color(2,100,100,0)
+            curses.init_color(3,500,225,0)
+            curses.init_color(4,600,300,0)
+            curses.init_color(5,700,500,0)
+            curses.init_color(6,900,800,0)
             curses.init_color(7,1000,1000,1000)
             for pair in range(1,8):
                 curses.init_pair(pair,7-pair,0)
@@ -40,60 +39,31 @@ def main(stdscr):
             stdscr.clear()
     stdscr.nodelay(True)
     a = np.zeros((height,width))
-
     while True:
         # a = np.roll(a,-1,axis=0)
-        for row in range(0,height-1,1):
+        for row in range(0,height-1):
             tmp = [None]*width
             for col in range(0,width):
-                tmp[col] = a[row][col]
-                count = 1
+                avg = a[row+1][col]
                 if col > 0:
-                    tmp[col]+=a[row][col-1]
-                    count+=1
+                    avg += a[row+1][col-1]
+                    avg += a[row][col-1]
                 if col < width-1:
-                    tmp[col]+=a[row][col+1]
-                    count+=1
-                if row > 0:
-                    tmp[col]+=a[row-1][col]
-                    count+=1
-                    if col > 0:
-                        tmp[col]+=a[row-1][col-1]
-                        count+=1
-                    if col < width-1:
-                        tmp[col]+=a[row-1][col+1]
-                        count+=1
-                if row < height-1:
-                    tmp[col]+=a[row+1][col]
-                    count+=1
-                    if col > 0:
-                        tmp[col]+=a[row+1][col-1]
-                        count+=1
-                    if col < width-1:
-                        tmp[col]+=a[row+1][col+1]
-                        count+=1
-                tmp[col]=tmp[col]/count
-            a[row+1]=tmp
-
-
-        #the roll call needs to be replaced with a blending call
-        #i dont know if this is the same as the averaging call
+                    avg += a[row+1][col+1]
+                    avg += a[row][col+1]
+                tmp[col]=avg/5.05
+            a[row]=tmp
         for i in range(0,width):
-            a[height-1][i]=random.random()/2+.5
-            #this random bit needs to be replaced with a better palette
+            a[height-1][i]=random.random()
         for x in range(0,width):
-            for y in range(0,height):
+            for y in range(0,height-1):#the bottom row is ugly so i hide it
                 ch = gradient[int(len(gradient)*a[y][x])]
                 if curses.can_change_color()==True:
                     stdscr.addstr(y,x,ch,curses.color_pair(7-int(8*a[y][x])))
-                # elif curses.has_colors()==True:
-                #     stdscr.addstr(y,x,ch,curses.color_pair(int(a[y][x]*4)))
-                #needs to have the color pairs initialized above
+                elif curses.has_colors()==True:
+                    stdscr.addstr(y,x,ch,curses.color_pair(1+int(a[y][x]*6)))
                 else:
                     stdscr.addstr(y,x,ch)
-                #needs the color added in here at some point
-
-
         stdscr.refresh()
         if stdscr.getch() == ord('q'):
             break
